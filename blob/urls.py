@@ -7,6 +7,7 @@ app_name = 'blob'
 
 router = DefaultRouter()
 router.register('image', views.BlobImageViewSet)
+router.register('file', views.BlobFileViewSet)
 
 urlpatterns = [
     path("", include(router.urls)),
