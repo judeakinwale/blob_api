@@ -2,6 +2,7 @@ from unittest.mock import patch
 from django.test import TestCase
 from django.contrib.auth import get_user_model
 from core import models
+from blob import models as blob_models
 
 
 def sample_user(email='test@gmail.com', password='testpass'):
@@ -45,3 +46,21 @@ class ModelTests(TestCase):
         )
         self.assertTrue(user.is_superuser)
         self.assertTrue(user.is_staff)
+
+    def test_blob_image_str(self):
+        """test the blob image string representation"""
+        blob_image = blob_models.BlobImage.objects.create(
+            owner=sample_user(),
+            name="Blank Image",
+            description="A simple black image",
+        )
+        self.assertEqual(str(blob_image), blob_image.name)
+
+    def test_blob_file_str(self):
+        """test the string representation of the blob file"""
+        blob_file = blob_models.BlobFile.objects.create(
+            owner=sample_user(),
+            name="Empty File",
+            description="An empty file",
+        )
+        self.assertEqual(str(blob_file), blob_file.name)
