@@ -1,3 +1,4 @@
+import os
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
@@ -46,6 +47,8 @@ class PrivateBlobFileApiTest(TestCase):
         
     def tearDown(self):
         self.blob_file.file.delete()
+        if os.path.exists('test_file_for_file_uploads.txt'):
+            os.remove('test_file_for_file_uploads.txt')
 
     def test_retrieve_blob_files(self):
         """test retrieving a list of blob files"""
@@ -102,7 +105,7 @@ class PrivateBlobFileApiTest(TestCase):
 
     def test_creating_full_blob_file(self):
         """test creating a blob file with an uploaded file"""
-        with open('testfile.txt', 'w+') as file:
+        with open('test_file_for_file_uploads.txt', 'w+') as file:
             data = file.write('hello')
             file.seek(0)
             payload = {
@@ -130,7 +133,7 @@ class PrivateBlobFileApiTest(TestCase):
 
     def test_full_update_blob_file(self):
         """test updating a blob file using put"""
-        with open('testfile.txt', 'w+') as file:
+        with open('test_file_for_file_uploads.txt', 'w+') as file:
             file.write('hello')
             file.seek(0)
             payload = {
@@ -151,7 +154,7 @@ class PrivateBlobFileApiTest(TestCase):
     def test_upload_file_to_blob_file(self):
         """test updating a sample blob file with an image"""
         url = file_detail_url(self.blob_file.id)
-        with open('text.txt', 'w+') as file:
+        with open('test_file_for_file_uploads.txt', 'w+') as file:
             file.write('hello 2')
             file.seek(0)
             res = self.client.patch(url, {'file': file}, format='multipart')

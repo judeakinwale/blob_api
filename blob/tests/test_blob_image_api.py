@@ -54,10 +54,8 @@ class PrivateBlobImageApiTest(TestCase):
 
     def test_retrieve_blob_images(self):
         """test retrieving a list of blob images"""
-        self.blob_image
         sample_blob_image(user=self.user, name='Test image 1')
-
-        images = models.BlobImage.objects.all().order_by('id')
+        images = models.BlobImage.objects.all()
         serializer = serializers.BlobImageSerializer(images, many=True)
 
         res = self.client.get(IMAGE_URL)
@@ -66,18 +64,18 @@ class PrivateBlobImageApiTest(TestCase):
         self.assertEqual(res.data, serializer.data)
 
     def test_blob_images_not_limited_to_user(self):
-        """test that the ingredients for all users are returned"""
+        """test that the images for all users are returned"""
         user2 = get_user_model().objects.create_user(
             'testuser2@gmail.com',
             'testpass2'
         )
-        self.blob_image
         sample_blob_image(user=user2)
 
         images = models.BlobImage.objects.all()
         serializer = serializers.BlobImageSerializer(images, many=True)
 
         res = self.client.get(IMAGE_URL)
+        print(res.data)
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(len(res.data), 2)
@@ -85,10 +83,9 @@ class PrivateBlobImageApiTest(TestCase):
 
     def test_view_blob_image_detail(self):
         """test viewing a blob image detail"""
-        image = sample_blob_image(user=self.user)
-        serializer = serializers.BlobImageSerializer(image)
+        serializer = serializers.BlobImageSerializer(self.blob_image)
+        url = image_detail_url(self.blob_image.id)
 
-        url = image_detail_url(image.id)
         res = self.client.get(url)
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
@@ -126,21 +123,19 @@ class PrivateBlobImageApiTest(TestCase):
 
     def test_partial_update_blob_image(self):
         """test updating an image with patch"""
-        image = self.blob_image
         payload = {
             'name': 'Updated image'
         }
 
-        url = image_detail_url(image.id)
+        url = image_detail_url(self.blob_image.id)
         res = self.client.patch(url, payload)
 
-        image.refresh_from_db()
+        self.blob_image.refresh_from_db()
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertEqual(image.name, payload['name'])
+        self.assertEqual(self.blob_image.name, payload['name'])
 
     def test_full_update_blob_image(self):
         """test updating an image with patch"""
-        image = self.blob_image
         with tempfile.NamedTemporaryFile(suffix='.jpg') as ntf:
             img = Image.new('RGB', (10, 10))
             img.save(ntf, format='JPEG')
@@ -151,12 +146,12 @@ class PrivateBlobImageApiTest(TestCase):
                 'image': ntf
             }
 
-            url = image_detail_url(image.id)
+            url = image_detail_url(self.blob_image.id)
             res = self.client.put(url, payload)
 
-        image.refresh_from_db()
-        self.assertEqual(image.name, payload['name'])
-        self.assertEqual(image.description, payload['description'])
+        self.blob_image.refresh_from_db()
+        self.assertEqual(self.blob_image.name, payload['name'])
+        self.assertEqual(self.blob_image.description, payload['description'])
         self.assertIn('image', res.data)
 
     def test_upload_image_to_blob_image(self):
