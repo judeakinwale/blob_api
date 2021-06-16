@@ -1,14 +1,20 @@
-from logging import error
-import os
 import tempfile
 from PIL import Image
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 from rest_framework import status, permissions, authentication
-from rest_framework.test import APIClient
-from blob import models, serializers, urls
+from rest_framework.request import Request
+from rest_framework.test import APIClient, APIRequestFactory
+from blob import models, serializers
 
+
+# For creating a test request
+factory = APIRequestFactory()
+request = factory.get('/')
+# create context for serializer
+# serializer_context = {'request': Request(request)}
+serializer_context = {'request': Request(request)}
 
 IMAGE_URL = reverse('blob:blobimage-list')
 
@@ -56,7 +62,7 @@ class PrivateBlobImageApiTest(TestCase):
         """test retrieving a list of blob images"""
         sample_blob_image(user=self.user, name='Test image 1')
         images = models.BlobImage.objects.all()
-        serializer = serializers.BlobImageSerializer(images, many=True)
+        serializer = serializers.BlobImageSerializer(images, many=True, context=serializer_context)
 
         res = self.client.get(IMAGE_URL)
 
@@ -72,10 +78,10 @@ class PrivateBlobImageApiTest(TestCase):
         sample_blob_image(user=user2)
 
         images = models.BlobImage.objects.all()
-        serializer = serializers.BlobImageSerializer(images, many=True)
+        serializer = serializers.BlobImageSerializer(images, many=True, context=serializer_context)
 
         res = self.client.get(IMAGE_URL)
-        print(res.data)
+        print(f"\n {res.data} \n")
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(len(res.data), 2)
@@ -83,7 +89,7 @@ class PrivateBlobImageApiTest(TestCase):
 
     def test_view_blob_image_detail(self):
         """test viewing a blob image detail"""
-        serializer = serializers.BlobImageSerializer(self.blob_image)
+        serializer = serializers.BlobImageSerializer(self.blob_image, context=serializer_context)
         url = image_detail_url(self.blob_image.id)
 
         res = self.client.get(url)

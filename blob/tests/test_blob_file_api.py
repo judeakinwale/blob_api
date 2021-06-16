@@ -3,8 +3,16 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 from rest_framework import status
-from rest_framework.test import APIClient
+from rest_framework.request import Request
+from rest_framework.test import APIClient, APIRequestFactory
 from blob import models, serializers
+
+
+# For creating a test request
+factory = APIRequestFactory()
+request = factory.get('/')
+# create context for serializer
+serializer_context = {'request': Request(request)}
 
 
 FILE_URL = reverse('blob:blobfile-list')
@@ -44,7 +52,7 @@ class PrivateBlobFileApiTest(TestCase):
         )
         self.client.force_authenticate(self.user)
         self.blob_file = sample_blob_file(user=self.user)
-        
+
     def tearDown(self):
         self.blob_file.file.delete()
         if os.path.exists('test_file_for_file_uploads.txt'):
@@ -54,7 +62,7 @@ class PrivateBlobFileApiTest(TestCase):
         """test retrieving a list of blob files"""
         sample_blob_file(user=self.user, name='Test file 2')
         files = models.BlobFile.objects.all()
-        serializer = serializers.BlobFileSerializer(files, many=True)
+        serializer = serializers.BlobFileSerializer(files, many=True, context=serializer_context)
 
         res = self.client.get(FILE_URL)
 
@@ -70,10 +78,10 @@ class PrivateBlobFileApiTest(TestCase):
         sample_blob_file(user=user2)
 
         files = models.BlobFile.objects.all()
-        serializer = serializers.BlobFileSerializer(files, many=True)
+        serializer = serializers.BlobFileSerializer(files, many=True, context=serializer_context)
 
         res = self.client.get(FILE_URL)
-        print(res.data)
+        print(f"\n {res.data} \n")
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(len(res.data), 2)
@@ -81,7 +89,7 @@ class PrivateBlobFileApiTest(TestCase):
 
     def test_view_blob_file_detail(self):
         """test viewing a blob file detail"""
-        serializer = serializers.BlobFileSerializer(self.blob_file)
+        serializer = serializers.BlobFileSerializer(self.blob_file, context=serializer_context)
         url = file_detail_url(self.blob_file.id)
 
         res = self.client.get(url)
@@ -106,7 +114,7 @@ class PrivateBlobFileApiTest(TestCase):
     def test_creating_full_blob_file(self):
         """test creating a blob file with an uploaded file"""
         with open('test_file_for_file_uploads.txt', 'w+') as file:
-            data = file.write('hello')
+            file.write('hello')
             file.seek(0)
             payload = {
                 'name': 'Test txt file',
@@ -124,7 +132,7 @@ class PrivateBlobFileApiTest(TestCase):
             'name': 'Different file 2'
         }
         url = file_detail_url(self.blob_file.id)
-        
+
         res = self.client.patch(url, payload)
 
         self.blob_file.refresh_from_db()
@@ -143,7 +151,7 @@ class PrivateBlobFileApiTest(TestCase):
             }
             url = file_detail_url(self.blob_file.id)
 
-            res =  self.client.put(url, payload)
+            res = self.client.put(url, payload)
 
         self.blob_file.refresh_from_db()
         self.assertEqual(res.status_code, status.HTTP_200_OK)

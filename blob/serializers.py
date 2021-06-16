@@ -8,11 +8,9 @@ class BlobImageSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = models.BlobImage
-        fields = ['id', 'owner', 'name', 'description', 'image']
+        fields = ['id', 'url', 'owner', 'name', 'description', 'image']
         extra_kwargs = {
-            'url': {
-                'view_name': 'blobimage-detail'
-            }
+            'url': {'view_name': 'blob:blobimage-detail'}
         }
 
 
@@ -22,12 +20,8 @@ class BlobFileSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = models.BlobFile
-        fields = ['id', 'owner', 'name', 'description', 'file']
+        fields = ['id', 'url', 'owner', 'name', 'description', 'file']
         lookup_field = 'id'
         extra_kwargs = {
-            'url': {
-                # 'view_name': 'blobfile-detail',
-                'lookup_field': 'id'
-            },
-            # 'owner': {'lookup_field': 'id'}
+            'url': {'view_name': 'blob:blobfile-detail'}
         }
