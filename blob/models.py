@@ -10,7 +10,7 @@ class BlobImage(models.Model):
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Owner"), on_delete=models.CASCADE)
     name = models.CharField(max_length=250)
     description = models.TextField(null=True, blank=True)
-    image = models.ImageField(upload_to="images/%Y/%m/%d/", null=True, blank=True)
+    image = models.ImageField(upload_to="images/%Y/%m/%d/", null=True)
 
     class Meta:
         verbose_name = _("BlobImage")
@@ -27,7 +27,7 @@ class BlobFile(models.Model):
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Owner"), on_delete=models.CASCADE)
     name = models.CharField(max_length=250)
     description = models.TextField(null=True, blank=True)
-    file = models.FileField(upload_to="files/%Y/%m/%d/", max_length=100, null=True, blank=True)
+    file = models.FileField(upload_to="files/%Y/%m/%d/", max_length=100, null=True)
 
     class Meta:
         verbose_name = _("BlobFile")
