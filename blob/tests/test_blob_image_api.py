@@ -13,7 +13,6 @@ from blob import models, serializers
 factory = APIRequestFactory()
 request = factory.get('/')
 # create context for serializer
-# serializer_context = {'request': Request(request)}
 serializer_context = {'request': Request(request)}
 
 IMAGE_URL = reverse('blob:blobimage-list')
@@ -81,7 +80,6 @@ class PrivateBlobImageApiTest(TestCase):
         serializer = serializers.BlobImageSerializer(images, many=True, context=serializer_context)
 
         res = self.client.get(IMAGE_URL)
-        print(f"\n {res.data} \n")
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(len(res.data), 2)

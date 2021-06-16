@@ -81,7 +81,6 @@ class PrivateBlobFileApiTest(TestCase):
         serializer = serializers.BlobFileSerializer(files, many=True, context=serializer_context)
 
         res = self.client.get(FILE_URL)
-        print(f"\n {res.data} \n")
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(len(res.data), 2)
