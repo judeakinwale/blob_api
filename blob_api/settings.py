@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
 import os
+import django_heroku
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -197,3 +198,6 @@ REST_FRAMEWORK = {
 # SITE_ID = 1
 
 # Simple JWT configuration
+
+# Activate Django-Heroku.
+django_heroku.settings(locals())
