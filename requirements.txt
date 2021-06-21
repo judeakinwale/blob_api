@@ -18,6 +18,7 @@ django-storages==1.11.1
 djangorestframework==3.12.4
 djangorestframework-simplejwt==4.7.1
 flake8==3.9.2
+gunicorn 
 idna==2.10
 Markdown==3.3.4
 mccabe==0.6.1
