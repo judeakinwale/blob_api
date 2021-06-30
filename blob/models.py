@@ -11,6 +11,8 @@ class BlobImage(models.Model):
     name = models.CharField(max_length=250)
     description = models.TextField(null=True, blank=True)
     image = models.ImageField(upload_to="images/%Y/%m/%d/", null=True)
+    timestamp = models.DateTimeField(auto_now=False, auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True, auto_now_add=False)
 
     class Meta:
         verbose_name = _("BlobImage")
@@ -28,6 +30,8 @@ class BlobFile(models.Model):
     name = models.CharField(max_length=250)
     description = models.TextField(null=True, blank=True)
     file = models.FileField(upload_to="files/%Y/%m/%d/", max_length=100, null=True)
+    timestamp = models.DateTimeField(auto_now=False, auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True, auto_now_add=False)
 
     class Meta:
         verbose_name = _("BlobFile")
